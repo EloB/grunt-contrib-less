@@ -100,6 +100,14 @@ Minified: 101615 bytes.
 Gzipped:  20084 bytes.
 ```
 
+#### sourceMap
+Type: `boolean`
+Default: false
+
+#### sourceMapRootpath
+Type: `string`
+Default: ''
+
 ### Usage Examples
 
 ```js
