@@ -17,8 +17,8 @@ module.exports = function(grunt) {
   var less = require('less');
 
   var lessOptions = {
-    parse: ['paths', 'optimization', 'filename', 'strictImports', 'syncImport', 'dumpLineNumbers', 'relativeUrls', 'rootpath'],
-    render: ['compress', 'yuicompress', 'ieCompat', 'strictMath']
+    parse: ['paths', 'optimization', 'filename', 'strictImports', 'syncImport', 'dumpLineNumbers', 'relativeUrls', 'rootpath', 'sourceMap', 'sourceMapFilename', 'sourceMapOutputFilename', 'sourceMapFullFilename', 'sourceMapBasepath', 'sourceMapRootpath', 'writeSourceMap'],
+    render: ['compress', 'yuicompress', 'ieCompat', 'strictMath', 'sourceMap', 'sourceMapFilename', 'sourceMapOutputFilename', 'sourceMapFullFilename', 'sourceMapBasepath', 'sourceMapRootpath', 'writeSourceMap']
   };
 
   grunt.registerMultiTask('less', 'Compile LESS files to CSS', function() {
@@ -33,6 +33,32 @@ module.exports = function(grunt) {
 
     grunt.util.async.forEachSeries(this.files, function(f, nextFileObj) {
       var destFile = f.dest;
+
+      if(options.sourceMap) {
+        var sourceMapFilename = path.basename(destFile) + '.map';
+
+        if(typeof options.sourceMap === 'string') {
+          sourceMapFilename = options.sourceMap;
+        }
+
+        if(!options.sourceMapRootpath) {
+          options.sourceMapRootpath = '';
+        }
+
+        options = grunt.util._.extend({
+          sourceMapFilename: sourceMapFilename,
+          sourceMap: Boolean(options.sourceMap),
+          sourceMapRootpath: '',
+          sourceMapOutputFilename: path.basename(destFile),
+          sourceMapFullFilename: destFile + '.map',
+          sourceMapBasepath: process.cwd()
+        }, options);
+        
+        options.writeSourceMap = function(output) {
+          grunt.file.write(options.sourceMapFullFilename, output);
+          grunt.log.writeln('File ' + options.sourceMapFullFilename.cyan + ' created.');  
+        };
+      }
 
       var files = f.src.filter(function(filepath) {
         // Warn on and remove invalid source files (if nonull was set).

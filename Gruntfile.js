@@ -104,6 +104,15 @@ module.exports = function(grunt) {
         files: {
           'tmp/yuicompressReport.css': ['test/fixtures/style.less', 'test/fixtures/style2.less', 'test/fixtures/style3.less']
         }
+      },
+      sourceMap: {
+        options: {
+          paths: ['test/fixtures/include'],
+          sourceMap: true
+        },
+        files: {
+          'tmp/sourceMap.css': 'test/fixtures/style.less'
+        }
       }
     },
 

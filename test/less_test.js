@@ -72,5 +72,21 @@ exports.less = {
     test.equal(expected, actual, 'should generate data-uris only when under the 32KB mark for Internet Explorer 8');
 
     test.done();
+  },
+  sourceMap: function(test) {
+    'use strict';
+
+    var actual, expected;
+
+    actual = grunt.file.read('tmp/sourceMap.css');
+    expected = grunt.file.read('test/expected/sourceMap.css');
+
+    test.equal(expected, actual, 'should generate the css with the source map comment');
+
+    actual = grunt.file.read('tmp/sourceMap.css.map');
+    expected = grunt.file.read('test/expected/sourceMap.css.map');
+    test.equal(expected, actual, 'should generate the source map file');
+
+    test.done();
   }
 };
