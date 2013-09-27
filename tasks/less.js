@@ -34,7 +34,29 @@ module.exports = function(grunt) {
     grunt.util.async.forEachSeries(this.files, function(f, nextFileObj) {
       var destFile = f.dest;
 
-      if(options.sourceMap) {
+      var files = f.src.filter(function(filepath) {
+        // Warn on and remove invalid source files (if nonull was set).
+        if (!grunt.file.exists(filepath)) {
+          grunt.log.warn('Source file "' + filepath + '" not found.');
+          return false;
+        } else {
+          return true;
+        }
+      });
+
+      if (files.length === 0) {
+        if (f.src.length < 1) {
+          grunt.log.warn('Destination not written because no source files were found.');
+        }
+
+        // No src files, goto next target. Warn would have been issued above.
+        return nextFileObj();
+      }
+      
+      if(files.length > 1 && options.sourceMap) {
+        grunt.log.warn('Source map not written for ' + destFile.cyan + ' because multiple source files are listed.');
+        options.sourceMap = false;
+      } else if(options.sourceMap) {
         var sourceMapFilename = path.basename(destFile) + '.map';
 
         if(typeof options.sourceMap === 'string') {
@@ -58,25 +80,6 @@ module.exports = function(grunt) {
           grunt.file.write(options.sourceMapFullFilename, output);
           grunt.log.writeln('File ' + options.sourceMapFullFilename.cyan + ' created.');  
         };
-      }
-
-      var files = f.src.filter(function(filepath) {
-        // Warn on and remove invalid source files (if nonull was set).
-        if (!grunt.file.exists(filepath)) {
-          grunt.log.warn('Source file "' + filepath + '" not found.');
-          return false;
-        } else {
-          return true;
-        }
-      });
-
-      if (files.length === 0) {
-        if (f.src.length < 1) {
-          grunt.log.warn('Destination not written because no source files were found.');
-        }
-
-        // No src files, goto next target. Warn would have been issued above.
-        return nextFileObj();
       }
 
       var compiledMax = [], compiledMin = [];
